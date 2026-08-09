@@ -20,6 +20,7 @@ import {
   deleteEvent as deleteEventAPI,
   deleteVat as deleteVatAPI,
   deleteCategory as deleteCategoryAPI,
+  deletProduct as deletProductAPI,
   editUser as editUserAPI,
   editEvent as editEventAPI,
   editVat as editVatAPI,
@@ -365,6 +366,20 @@ export default function useData() {
     }
   }
 
+  const deleteProduct = async (id: number) => {
+    try {
+      setIsloading(true);
+      const response = await deletProductAPI(Cookies.get("token") ?? "", id);
+      if (response.status === 204) return true;
+      setErrorMessage(response.statusText);
+      return false;
+    } catch {
+      setErrorMessage("Erreur serveur");
+    } finally {
+      setIsloading(false);
+    }
+  }
+
   // PATCH
   const editUser = async (id: number, user: user) => {
     try {
@@ -457,6 +472,7 @@ export default function useData() {
     deleteEvent,
     deleteVat,
     deleteCateogry,
+    deleteProduct,
     editUser,
     editEvent,
     editVat,

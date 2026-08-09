@@ -66,7 +66,7 @@ export default function Categories() {
                 <button onClick={(e) => {
                   e.stopPropagation();
                   if (category.picture)  window.open(category.picture, '_blank');
-                }} className="bg-blue-500"><Image/></button>
+                }} className={category.picture ? 'bg-blue-500' : 'pointer-events-none'}><Image/></button>
                 <p className="text-center">{category.vat_type}</p>
               </div>
             ))}

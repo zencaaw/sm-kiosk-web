@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router";
+import './style.css';
 
 import Header from "./templates/Header";
 import Loader from "./components/Loader";

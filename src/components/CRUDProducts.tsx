@@ -4,9 +4,14 @@ import type { category, product } from "../type";
 import { useEffect, useRef, useState, type SyntheticEvent } from "react";
 import useData from "../hooks/useData";
 import Loader from "./Loader";
+import Modal from "./Modal";
+import { useParams, useNavigate } from "react-router";
 
 export default function CRUDProducts({ product, submitFunc, isLoading }: { product?: product, submitFunc: (product: product) => void, isLoading: boolean }) {
-  const { categories, isLoading: isLoadingCategories } = useData();
+  const { categories, deleteProduct, isLoading: isLoadingDelete, errorMessage } = useData();
+  const params = useParams();
+  const navigate = useNavigate();
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   const [categoriesList, setCategoriesList] = useState<Array<category>>([]);
 
   const labelRef = useRef<HTMLInputElement>(null);
@@ -53,8 +58,12 @@ export default function CRUDProducts({ product, submitFunc, isLoading }: { produ
 
 
   return (
-    <div className="flex flex-col items-center">
-      <form onSubmit={onsubmit} className="flex flex-col gap-4">
+    <>
+      <Modal modalIsOpen={modalIsOpen} setModalIsOpen={setModalIsOpen}>
+        <p>{errorMessage}</p>
+      </Modal>
+      <div className="flex flex-col items-center">
+        <form onSubmit={onsubmit} className="flex flex-col gap-4">
         <IconInput Icon={<Hash />} defaultValue={product?.id} className="w-full" disabled hidden={product === undefined} />
         <IconInput Icon={<Edit />} ref={labelRef} placeholder="Label" type="text" defaultValue={product?.label} className="w-full" />
         <div className="flex items-center gap-2">
@@ -77,9 +86,19 @@ export default function CRUDProducts({ product, submitFunc, isLoading }: { produ
         </div>
         <button type="submit" className="bg-blue-500">{product !== undefined ? "Modifier" : "Créer"}</button>
         <span className={`border border-gray-200 ${product !== undefined ? "" : "hidden"}`} />
-        <button type="button" className={`bg-red-500 ${product !== undefined ? "" : "hidden"}`}>Supprimer</button>
-        <Loader isLoading={isLoadingCategories || isLoading} />
+        <button type="button" onClick={async () => {
+          if (Number(params.id)) {
+            const isDone = await deleteProduct(Number(params.id));
+            if (isDone) {
+              navigate("/products");
+            } else {
+              setModalIsOpen(true);
+            }
+          }
+        }} disabled={isLoadingDelete || isLoading} className={`bg-red-500 ${product !== undefined ? "" : "hidden"}`}>Supprimer</button>
+        <Loader isLoading={isLoadingDelete || isLoading} />
       </form>
     </div>
+    </>
   )
 }

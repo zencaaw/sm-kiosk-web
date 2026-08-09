@@ -29,7 +29,6 @@ export default function Users() {
       if (response) {
         setUsersList(response.users)
         setTotal(response.total);
-        console.log(response.total);
       } else {
         setModalIsOpen(true);
       }
@@ -69,8 +68,8 @@ export default function Users() {
                 <p className="text-center">{user.email}</p>
                 <button onClick={(event) => {
                   event.stopPropagation();
-                  if (user.avatar)  window.open(user.avatar, '_blank');
-                }} className="bg-blue-500"><Image/></button>
+                  if (user.avatar) window.open(user.avatar, '_blank');
+                }} className={user.avatar ? 'bg-blue-500' : 'pointer-events-none'}><Image/></button>
                 <p className="text-center">{user.is_admin ? 'Oui' : 'Non'}</p>
               </div>
             ))}

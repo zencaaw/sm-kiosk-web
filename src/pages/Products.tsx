@@ -71,7 +71,7 @@ export default function Products() {
                 <button onClick={(event) => {
                   event.stopPropagation();
                   if (product.picture)  window.open(product.picture, '_blank');
-                }} className="bg-blue-500"><Image/></button>
+                }} className={product.picture ? 'bg-blue-500' : 'pointer-events-none'}><Image/></button>
                 <p className="text-center">{product.category.id}</p>
                 <p className="text-center">{product.event_id}</p>
               </div>

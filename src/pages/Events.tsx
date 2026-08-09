@@ -69,7 +69,7 @@ export default function Events() {
                 <button onClick={(e) => {
                   e.stopPropagation();
                   if (event.image)  window.open(event.image, '_blank');
-                }} className="bg-blue-500"><Image/></button>
+                }} className={event.image ? 'bg-blue-500' : 'pointer-events-none'}><Image/></button>
                 <p className="text-center">{event.is_active ? 'Oui' : 'Non'}</p>
               </div>
             ))}
