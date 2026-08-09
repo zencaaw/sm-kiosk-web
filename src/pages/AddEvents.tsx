@@ -18,9 +18,9 @@ export default function AddEvents() {
     dispatch(changeTitle("Ajouter un Évènement"));
   }, []);
 
-  const submit = async (event: event) => {
+  const submit = async (event: event, image: File | undefined) => {
     if (event !== undefined) {
-      const isDone = await createEvent(event);
+      const isDone = await createEvent(event, image);
       if (isDone) {
         navigate("/events");
       } else {

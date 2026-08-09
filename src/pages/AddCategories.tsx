@@ -18,9 +18,9 @@ export default function AddCategories() {
     dispatch(changeTitle("Ajouter une catégorie"));
   }, []);
 
-  const submit = async (category: category) => {
+  const submit = async (category: category, picture: File | undefined) => {
     if (category !== undefined) {
-      const isDone = await createCategory(category);
+      const isDone = await createCategory(category, picture);
       if (isDone) {
         navigate("/categories");
       } else {

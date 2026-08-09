@@ -1,5 +1,7 @@
 import { useState } from "react"
 import {
+  getURL as getURLAPI,
+  uploadImage as uploadImageAPI,
   login as loginAPI,
   createUser as createUserAPI,
   createEvent as createEventAPI,
@@ -67,6 +69,28 @@ export default function useData() {
     }
   }
 
+  // CLOUDFLARE
+
+  const getURL = async () => {
+    try {
+      setIsloading(true);
+      const response = await getURLAPI(Cookies.get("token") ?? "");
+      return response;
+    } catch (error) {
+      checkError(error);
+    } finally {
+      setIsloading(false);
+    }
+  }
+
+  const uploadImage = async (formData: FormData) => {
+    setIsloading(true);
+    const res = await getURL();
+    await uploadImageAPI(res?.data.uploadURL, formData);
+    setIsloading(false);
+    return res?.data.id;
+  };
+
   // POST
   const login = async (email: string, password: string) => {
     try {
@@ -87,9 +111,15 @@ export default function useData() {
     }
   }
 
-  const createUser = async (user: user) => {
+  const createUser = async (user: user, avatar: File | undefined) => {
     try {
       setIsloading(true);
+      if (avatar) {
+        const formData = new FormData();
+        formData.append("file", avatar);
+        const avatarId = await uploadImage(formData);
+        user.avatar = avatarId;
+      }
       await createUserAPI(Cookies.get("token") ?? "", user);
       return true;
     } catch (error) {
@@ -100,9 +130,15 @@ export default function useData() {
     }
   }
 
-  const createEvent = async (event: event) => {
+  const createEvent = async (event: event, image: File | undefined) => {
     try {
       setIsloading(true);
+      if (image) {
+        const formData = new FormData();
+        formData.append("file", image);
+        const imageId = await uploadImage(formData);
+        event.image = imageId;
+      }
       await createEventAPI(Cookies.get("token") ?? "", event);
       return true;
     } catch (error) {
@@ -113,9 +149,15 @@ export default function useData() {
     }
   }
 
-  const createCategory = async (category: category) => {
+  const createCategory = async (category: category, picture: File | undefined) => {
     try {
       setIsloading(true);
+      if (picture) {
+        const formData = new FormData();
+        formData.append("file", picture);
+        const pictureId = await uploadImage(formData);
+        category.picture = pictureId;
+      }
       await createCategoryAPI(Cookies.get("token") ?? "", category);
       return true;
     } catch (error) {
@@ -139,9 +181,15 @@ export default function useData() {
     }
   }
 
-  const createProduct = async (product: product) => {
+  const createProduct = async (product: product, picture: File | undefined) => {
     try {
       setIsloading(true);
+      if (picture) {
+        const formData = new FormData();
+        formData.append("file", picture);
+        const pictureId = await uploadImage(formData);
+        product.picture = pictureId;
+      }
       await createProductAPI(Cookies.get("token") ?? "", product);
       return true;
     } catch (error) {
@@ -365,8 +413,14 @@ export default function useData() {
   }
 
   // PATCH
-  const editUser = async (id: number, user: user) => {
+  const editUser = async (id: number, user: user, avatar: File | undefined) => {
     try {
+      if (avatar) {
+        const formData = new FormData();
+        formData.append("file", avatar);
+        const avatarId = await uploadImage(formData);
+        user.avatar = avatarId;
+      }
       setIsloading(true);
       await editUserAPI(Cookies.get("token") ?? "", id, user);
       return true;
@@ -378,8 +432,14 @@ export default function useData() {
     }
   }
 
-  const editEvent = async (id: number, event: event) => {
+  const editEvent = async (id: number, event: event, image: File | undefined) => {
     try {
+      if (image) {
+        const formData = new FormData();
+        formData.append("file", image);
+        const imageId = await uploadImage(formData);
+        event.image = imageId;
+      }
       setIsloading(true);
       await editEventAPI(Cookies.get("token") ?? "", id, event);
       return true;
@@ -404,8 +464,14 @@ export default function useData() {
     }
   }
 
-  const editCategory = async (id: number, category: category) => {
+  const editCategory = async (id: number, category: category, picture: File | undefined) => {
     try {
+      if (picture) {
+        const formData = new FormData();
+        formData.append("file", picture);
+        const pictureId = await uploadImage(formData);
+        category.picture = pictureId;
+      }
       setIsloading(true);
       await editCategoryAPI(Cookies.get("token") ?? "", id, category);
       return true;
@@ -417,8 +483,14 @@ export default function useData() {
     }
   }
 
-  const editProduct = async (id: number, product: product) => {
+  const editProduct = async (id: number, product: product, picture: File | undefined) => {
     try {
+      if (picture) {
+        const formData = new FormData();
+        formData.append("file", picture);
+        const pictureId = await uploadImage(formData);
+        product.picture = pictureId;
+      }
       setIsloading(true);
       await editProductAPI(Cookies.get("token") ?? "", id, product);
       return true;

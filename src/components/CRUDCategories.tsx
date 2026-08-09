@@ -8,7 +8,7 @@ import Modal from "./Modal";
 import { useParams } from "react-router";
 import { useNavigate } from "react-router";
 
-export default function CRUDCategories({ category, submitFunc, isLoading }: { category?: category, submitFunc: (category: category) => void, isLoading: boolean}) {
+export default function CRUDCategories({ category, submitFunc, isLoading }: { category?: category, submitFunc: (category: category, picture: File | undefined) => void, isLoading: boolean}) {
   const { vats, isLoading: isLoadingVats, errorMessage: errorMessageVats } = useData();
   const { deleteCateogry, isLoading: isLoadingDelete, errorMessage: errorMessageDelete } = useData();
   const params = useParams();
@@ -25,10 +25,10 @@ export default function CRUDCategories({ category, submitFunc, isLoading }: { ca
     event.preventDefault();
     const label = labelRef.current?.value;
     const vat_type = vatRef.current?.value;
-    const picture = pictureRef.current?.value;
+    const picture = pictureRef.current?.files?.[0];
 
     if (label && vat_type) {
-      submitFunc({ label, vat_type, picture });
+      submitFunc({ label, vat_type, picture: category?.picture }, picture);
     }
   }
 
@@ -61,7 +61,14 @@ export default function CRUDCategories({ category, submitFunc, isLoading }: { ca
           <div className="flex items-center gap-2">
             <p className="text-xl">Image</p>
             <IconInput ref={pictureRef} Icon={<Image />} type="file" />
-            <button type="button" className="bg-blue-500"><X/></button>
+            <button type="button" onClick={() => {
+              if (pictureRef.current?.value) {
+                pictureRef.current.value = "";
+              }
+            }} className="bg-blue-500"><X/></button>
+            <button type="button" onClick={() => {
+              if (category?.picture) window.open(category.picture, '_blank');
+            }} className={category?.picture ? 'bg-blue-500' : 'pointer-events-none'}><Image/></button>
           </div>
           <button type="submit" className="bg-blue-500">{category !== undefined ? "Modifier" : "Créer"}</button>
           <span className={`border border-gray-200 ${category !== undefined ? "" : "hidden"}`} />

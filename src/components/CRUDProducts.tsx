@@ -7,7 +7,7 @@ import Loader from "./Loader";
 import Modal from "./Modal";
 import { useParams, useNavigate } from "react-router";
 
-export default function CRUDProducts({ product, submitFunc, isLoading }: { product?: product, submitFunc: (product: product) => void, isLoading: boolean }) {
+export default function CRUDProducts({ product, submitFunc, isLoading }: { product?: product, submitFunc: (product: product, picture: File | undefined) => void, isLoading: boolean }) {
   const { categories, deleteProduct, isLoading: isLoadingDelete, errorMessage } = useData();
   const params = useParams();
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ export default function CRUDProducts({ product, submitFunc, isLoading }: { produ
     const is_available = isAvailableRef.current?.checked;
     const excl_vat_price = priceRef.current?.value;
     const categoryId = categoryRef.current?.value;
-    const picture = imageRef.current?.value;
+    const picture = imageRef.current?.files?.[0];
     const eventId = eventIdRef.current?.value;
 
     if (label && is_available !== undefined && excl_vat_price && categoryId && eventId) {
@@ -44,7 +44,7 @@ export default function CRUDProducts({ product, submitFunc, isLoading }: { produ
         label,
         is_available,
         excl_vat_price: Number(excl_vat_price),
-        picture,
+        picture: product?.picture,
         event_id: Number(eventId),
         category: {
           id: Number(categoryId),
@@ -52,7 +52,7 @@ export default function CRUDProducts({ product, submitFunc, isLoading }: { produ
             type: ""
           }
         }
-      });
+      }, picture);
     }
   }
 
@@ -82,7 +82,14 @@ export default function CRUDProducts({ product, submitFunc, isLoading }: { produ
         <div className="flex items-center gap-2">
           <p className="text-xl">Image</p>
           <IconInput Icon={<Image />} ref={imageRef} type="file" />
-          <button type="button" className="bg-blue-500"><X/></button>
+          <button type="button" onClick={() => {
+            if (imageRef.current?.value) {
+              imageRef.current.value = "";
+            }
+          }} className="bg-blue-500"><X/></button>
+          <button type="button" onClick={() => {
+            if (product?.picture) window.open(product.picture, '_blank');
+          }} className={product?.picture ? 'bg-blue-500' : 'pointer-events-none'}><Image/></button>
         </div>
         <button type="submit" className="bg-blue-500">{product !== undefined ? "Modifier" : "Créer"}</button>
         <span className={`border border-gray-200 ${product !== undefined ? "" : "hidden"}`} />

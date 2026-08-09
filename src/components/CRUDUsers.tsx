@@ -7,7 +7,7 @@ import { useNavigate, useParams } from "react-router";
 import Modal from "./Modal";
 import Loader from "./Loader";
 
-export default function CRUDUsers({ user, submitFunc, isLoading }: { user?: user, submitFunc: (user: user) => void, isLoading: boolean}) {
+export default function CRUDUsers({ user, submitFunc, isLoading }: { user?: user, submitFunc: (user: user, avatar: File | undefined) => void, isLoading: boolean}) {
   const { deleteUser, isLoading: isLoadingDelete, errorMessage } = useData();
   const params = useParams();
   const navigate = useNavigate();
@@ -26,13 +26,14 @@ export default function CRUDUsers({ user, submitFunc, isLoading }: { user?: user
     const last_name = lastnameRef.current?.value;
     const email = emailRef.current?.value;
     const password = passwordRef.current?.value;
-    const avatar = avatarRef.current?.value;
+    const avatar = avatarRef.current?.files?.[0];
     const is_admin = isAdminRef.current?.checked;
     if (user === undefined && !password) {
       return;
     }
+
     if (first_name && last_name && email && is_admin !== undefined) {
-      submitFunc({ first_name, last_name, email, password, avatar, is_admin });
+      submitFunc({ first_name, last_name, email, password, is_admin }, avatar);
     }
   }
 
@@ -51,7 +52,15 @@ export default function CRUDUsers({ user, submitFunc, isLoading }: { user?: user
           <div className="flex items-center gap-2">
             <p className="text-xl">Avatar</p>
             <IconInput Icon={<Image />} ref={avatarRef} type="file"/>
-            <button type="button" className="bg-blue-500"><X/></button>
+            <button onClick={() => {
+              if (avatarRef.current?.value) {
+                avatarRef.current.value = "";
+              };
+            }
+            } type="button" className="bg-blue-500"><X /></button>
+            <button type="button" onClick={() => {
+              if (user?.avatar) window.open(user.avatar, '_blank');
+            }} className="bg-blue-500"><Image/></button>
           </div>
           <div className="flex items-center gap-2">
             <p className="text-xl">Est admin</p>

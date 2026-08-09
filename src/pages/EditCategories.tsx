@@ -30,10 +30,10 @@ export default function EditCategories() {
     }
   }, []);
 
-  const submit = async (category: category) => {
+  const submit = async (category: category, picture: File | undefined) => {
     const categoryId = params.id;
     if (category !== undefined && categoryId) {
-      const isDone = await editCategory(Number(categoryId),category);
+      const isDone = await editCategory(Number(categoryId),category, picture);
       if (isDone) {
         navigate("/categories");
       } else {

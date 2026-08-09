@@ -8,7 +8,7 @@ import useData from "../hooks/useData";
 import Loader from "./Loader";
 import Modal from "./Modal";
 
-export default function CRUDEvents({ event, submitFunc, isLoading }: { event?: event, submitFunc: (event: event) => void, isLoading: boolean }) {
+export default function CRUDEvents({ event, submitFunc, isLoading }: { event?: event, submitFunc: (event: event, image: File | undefined) => void, isLoading: boolean }) {
   const { deleteEvent, isLoading: isLoadingDelete, errorMessage } = useData();
   const params = useParams();
   const navigate = useNavigate();
@@ -20,16 +20,16 @@ export default function CRUDEvents({ event, submitFunc, isLoading }: { event?: e
   const imageRef = useRef<HTMLInputElement>(null);
   const ibanRef = useRef<HTMLInputElement>(null);
 
-  const onsubmit = async (event: SyntheticEvent) => {
-    event.preventDefault();
+  const onsubmit = async (submitEvent: SyntheticEvent) => {
+    submitEvent.preventDefault();
     const name = nameRef.current?.value;
     const location = locationRef.current?.value;
     const is_active = isActiveRef.current?.checked;
-    const image = imageRef.current?.value;
+    const image = imageRef.current?.files?.[0];
     const iban = ibanRef.current?.value;
 
-    if (name && location && is_active && iban) {
-      submitFunc({ name, location, is_active, image ,iban });
+    if (name && location && is_active !== undefined && iban) {
+      submitFunc({ name, location, is_active, image: event?.image, iban }, image);
     }
   }
 
@@ -48,9 +48,16 @@ export default function CRUDEvents({ event, submitFunc, isLoading }: { event?: e
             <input type="checkbox" ref={isActiveRef} defaultChecked={event?.is_active} />
           </div>
           <div className="flex items-center gap-2">
-            <p className="text-xl">Avatar</p>
+            <p className="text-xl">Image</p>
             <IconInput Icon={<Image />} ref={imageRef} type="file" />
-            <button type="button" className="bg-blue-500"><X/></button>
+            <button type="button" onClick={() => {
+              if (imageRef.current?.value) {
+                imageRef.current.value = "";
+              }
+            }} className="bg-blue-500"><X/></button>
+            <button type="button" onClick={() => {
+              if (event?.image) window.open(event.image, '_blank');
+            }} className={event?.image ? 'bg-blue-500' : 'pointer-events-none'}><Image/></button>
           </div>
           <IconInput Icon={<PiggyBank/>} ref={ibanRef} placeholder="IBAN" defaultValue={event?.iban} className="w-full"/>
           <button type="submit" className="bg-blue-500">{event !== undefined ? "Modifier" : "Créer"}</button>

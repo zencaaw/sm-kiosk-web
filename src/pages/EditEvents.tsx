@@ -29,10 +29,10 @@ export default function EditEvents() {
     }
   }, []);
 
-  const submit = async (event: event) => {
+  const submit = async (event: event, image: File | undefined) => {
     const eventId = params.id;
     if (event !== undefined && eventId) {
-      const isDone = await editEvent(Number(eventId), event);
+      const isDone = await editEvent(Number(eventId), event, image);
       if (isDone) {
         navigate("/events");
       } else {

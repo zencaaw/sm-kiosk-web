@@ -9,6 +9,25 @@ import type {
 
 const url = "http://localhost:3001/v1/";
 
+// CLOUDFLARE
+export const getURL = async (token: string) => {
+  const response = await axios.get(
+    `${url}img-upload`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response;
+};
+
+export const uploadImage = async (url: string, formData: FormData) => {
+  const response = await axios.post(url, formData, {
+  });
+  return response;
+};
+
 // POST
 export const login = async (email: string, password: string) => {
   const response = await axios.post(
@@ -29,7 +48,7 @@ export const createUser = async (token: string, user: userType) => {
       email: user.email,
       password: user.password,
       is_admin: user.is_admin,
-      avatar: user.avatar
+      avatar: user.avatar === "" ? undefined : user.avatar
     },
     {
     headers: {
@@ -249,7 +268,6 @@ export const editUser = async (token: string, id: number, user: userType) => {
       first_name: user.first_name,
       last_name: user.last_name,
       email: user.email,
-      password: user.password,
       is_admin: user.is_admin,
       avatar: user.avatar
     },

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { changeTitle } from "../store/headerSlice";
-import { Search, Plus, LoaderCircle, ChevronLeft, ChevronRight, Image } from "lucide-react";
+import { Search, Plus, LoaderCircle, Image } from "lucide-react";
 import { useNavigate } from "react-router";
 import IconInput from "../components/IconInput";
 import useData from "../hooks/useData";

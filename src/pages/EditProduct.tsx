@@ -29,10 +29,10 @@ export default function EditProducts() {
     }
   }, []);
 
-  const submit = async (product: product) => {
+  const submit = async (product: product, picture: File | undefined) => {
     const productId = params.id;
     if (product !== undefined && productId) {
-      const isDone = await editProduct(Number(productId), product);
+      const isDone = await editProduct(Number(productId), product, picture);
       if (isDone) {
         navigate("/products");
       } else {

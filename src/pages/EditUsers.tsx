@@ -30,10 +30,10 @@ export default function EditUsers() {
     }
   }, []);
 
-  const submit = async (user: user) => {
+  const submit = async (user: user, avatar: File | undefined) => {
     const userId = params.id;
     if (user !== undefined && userId) {
-      const isDone = await editUser(Number(userId),user);
+      const isDone = await editUser(Number(userId), user, avatar);
       if (isDone) {
         navigate("/users");
       } else {

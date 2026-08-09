@@ -17,9 +17,9 @@ export default function AddUsers() {
     dispatch(changeTitle("Ajouter un utilisateurs"));
   }, []);
 
-  const submit = async (user: user) => {
+  const submit = async (user: user, avatar: File | undefined) => {
     if (user !== undefined) {
-      const isDone = await createUser(user);
+      const isDone = await createUser(user, avatar);
       if (isDone) {
         navigate("/users");
       } else {

@@ -17,9 +17,9 @@ export default function AddProducts() {
     dispatch(changeTitle("Ajouter un produit"));
   }, []);
 
-  const submit = async (product: product) => {
+  const submit = async (product: product, picture: File | undefined) => {
     if (product !== undefined) {
-      const isDone = await createProduct(product);
+      const isDone = await createProduct(product, picture);
       if (isDone) {
         navigate("/products");
       } else {
