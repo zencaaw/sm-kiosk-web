@@ -1,4 +1,5 @@
 import axios from "axios";
+import axiosRetry from "axios-retry";
 import type {
   user as userType,
   event as eventType,
@@ -8,6 +9,11 @@ import type {
 } from "./type";
 
 const url = "http://localhost:3001/v1/";
+
+axiosRetry(axios, {
+  retries: 5,
+  retryDelay: axiosRetry.exponentialDelay,
+});
 
 // CLOUDFLARE
 export const getURL = async (token: string) => {

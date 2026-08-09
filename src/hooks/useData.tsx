@@ -62,7 +62,7 @@ export default function useData() {
           setErrorMessage("Code erreur inconnue !");
         }
       } else {
-        setErrorMessage("Code erreur Inconnue !");
+        setErrorMessage("Erreur serveur !");
       }
     } else {
       setErrorMessage(`Erreur inconnue ! ${error}`);
