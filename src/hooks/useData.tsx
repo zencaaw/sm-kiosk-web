@@ -30,11 +30,42 @@ import {
 import Cookies from 'js-cookie'
 import type { category, event, product, user, vat } from "../type";
 import { useNavigate } from "react-router";
+import axios from "axios";
 
 export default function useData() {
   const navigate = useNavigate();
   const [isLoading, setIsloading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>();
+
+  const checkError = (error: unknown) => {
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+
+      if (status) {
+        if (status === 400) {
+          setErrorMessage("Requête invalide !");
+        } else if (status === 401) {
+          navigate("/login");
+        } else if (status === 403) {
+          setErrorMessage("Accès interdit !");
+        } else if (status === 404) {
+          setErrorMessage("Ressource non trouvée !");
+        } else if (status === 409) {
+          setErrorMessage("Conflit de données !");
+        } else if (status === 422) {
+          setErrorMessage("Données invalides !");
+        } else if (status === 500) {
+          setErrorMessage("Erreur serveur !");
+        } else {
+          setErrorMessage("Code erreur inconnue !");
+        }
+      } else {
+        setErrorMessage("Code erreur Inconnue !");
+      }
+    } else {
+      setErrorMessage(`Erreur inconnue ! ${error}`);
+    }
+  }
 
   // POST
   const login = async (email: string, password: string) => {
@@ -45,14 +76,12 @@ export default function useData() {
         setErrorMessage("Connexion non administrateur !");
         return false
       }
-      if (response.status === 200) {
-        Cookies.set("token", response.data.token, { expires: 7 });
-        return true;
-      }
-      setErrorMessage(response.statusText);
+
+      Cookies.set("token", response.data.token, { expires: 7 });
+      return true;
+    } catch (error) {
+      checkError(error);
       return false;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -61,12 +90,11 @@ export default function useData() {
   const createUser = async (user: user) => {
     try {
       setIsloading(true);
-      const response = await createUserAPI(Cookies.get("token") ?? "", user);
-      if (response.status === 201) return true;
-      setErrorMessage(response.statusText);
+      await createUserAPI(Cookies.get("token") ?? "", user);
+      return true;
+    } catch (error) {
+      checkError(error);
       return false;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -75,12 +103,11 @@ export default function useData() {
   const createEvent = async (event: event) => {
     try {
       setIsloading(true);
-      const response = await createEventAPI(Cookies.get("token") ?? "", event);
-      if (response.status === 201) return true;
-      setErrorMessage(response.statusText);
+      await createEventAPI(Cookies.get("token") ?? "", event);
+      return true;
+    } catch (error) {
+      checkError(error);
       return false;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -89,12 +116,11 @@ export default function useData() {
   const createCategory = async (category: category) => {
     try {
       setIsloading(true);
-      const response = await createCategoryAPI(Cookies.get("token") ?? "", category);
-      if (response.status === 201) return true;
-      setErrorMessage(response.statusText);
+      await createCategoryAPI(Cookies.get("token") ?? "", category);
+      return true;
+    } catch (error) {
+      checkError(error);
       return false;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -103,12 +129,11 @@ export default function useData() {
   const createVat = async (vat: vat) => {
     try {
       setIsloading(true);
-      const response = await createVatAPI(Cookies.get("token") ?? "", vat);
-      if (response.status === 201) return true;
-      setErrorMessage(response.statusText);
+      await createVatAPI(Cookies.get("token") ?? "", vat);
+      return true;
+    } catch (error) {
+      checkError(error);
       return false;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -117,12 +142,11 @@ export default function useData() {
   const createProduct = async (product: product) => {
     try {
       setIsloading(true);
-      const response = await createProductAPI(Cookies.get("token") ?? "", product);
-      if (response.status === 201) return true;
-      setErrorMessage(response.statusText);
+      await createProductAPI(Cookies.get("token") ?? "", product);
+      return true;
+    } catch (error) {
+      checkError(error);
       return false;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -133,20 +157,12 @@ export default function useData() {
     try {
       setIsloading(true);
       const response = await usersAPI(Cookies.get("token") ?? "", search, offset);
-      if (response.status === 401) {
-        Cookies.remove("token");
-        navigate("/login");
-        return;
-      }
-      if (response.status === 200) {
-        const users: Array<user> = response.data.data;
-        const total: number = response.data.pagination.total
-        return {users, total};
-      }
-      setErrorMessage(response.statusText);
+      const users: Array<user> = response.data.data;
+      const total: number = response.data.pagination.total
+      return {users, total};
+    } catch (error) {
+      checkError(error);
       return null;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -156,14 +172,11 @@ export default function useData() {
     try {
       setIsloading(true);
       const response = await userAPI(Cookies.get("token") ?? "", id);
-      if (response.status === 200) {
-        const user: user = response.data;
-        return user;
-      }
-      setErrorMessage(response.statusText);
+      const user: user = response.data;
+      return user;
+    } catch (error) {
+      checkError(error);
       return undefined;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -173,14 +186,11 @@ export default function useData() {
     try {
       setIsloading(true);
       const response = await eventAPI(Cookies.get("token") ?? "", id);
-      if (response.status === 200) {
-        const event: event = response.data;
-        return event;
-      }
-      setErrorMessage(response.statusText);
+      const event: event = response.data;
+      return event;
+    } catch (error) {
+      checkError(error);
       return undefined;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -190,14 +200,11 @@ export default function useData() {
     try {
       setIsloading(true);
       const response = await vatAPI(Cookies.get("token") ?? "", type);
-      if (response.status === 200) {
-        const vat: vat = response.data;
-        return vat;
-      }
-      setErrorMessage(response.statusText);
+      const vat: vat = response.data;
+      return vat;
+    } catch (error) {
+      checkError(error);
       return undefined;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -207,15 +214,12 @@ export default function useData() {
     try {
       setIsloading(true);
       const response = await eventsAPI(Cookies.get("token") ?? "", search, offset);
-      if (response.status === 200) {
-        const events: Array<event> = response.data.data;
-        const total: number = response.data.pagination.total
-        return {events, total};
-      }
-      setErrorMessage(response.statusText);
+      const events: Array<event> = response.data.data;
+      const total: number = response.data.pagination.total
+      return {events, total};
+    } catch (error) {
+      checkError(error);
       return null;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -225,15 +229,12 @@ export default function useData() {
     try {
       setIsloading(true);
       const response = await vatsAPI(Cookies.get("token") ?? "", search, offset);
-      if (response.status === 200) {
-        const vats: Array<vat> = response.data.data;
-        const total: number = response.data.pagination.total
-        return {vats, total};
-      }
-      setErrorMessage(response.statusText);
+      const vats: Array<vat> = response.data.data;
+      const total: number = response.data.pagination.total
+      return {vats, total};
+    } catch (error) {
+      checkError(error);
       return null;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -243,15 +244,12 @@ export default function useData() {
     try {
       setIsloading(true);
       const response = await categoriesAPI(Cookies.get("token") ?? "", search, offset);
-      if (response.status === 200) {
-        const categories: Array<category> = response.data.data;
-        const total: number = response.data.pagination.total
-        return {categories, total};
-      }
-      setErrorMessage(response.statusText);
+      const categories: Array<category> = response.data.data;
+      const total: number = response.data.pagination.total
+      return {categories, total};
+    } catch (error) {
+      checkError(error);
       return null;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -261,14 +259,11 @@ export default function useData() {
     try {
       setIsloading(true);
       const response = await categoryAPI(Cookies.get("token") ?? "", id);
-      if (response.status === 200) {
-        const category: category = response.data;
-        return category;
-      }
-      setErrorMessage(response.statusText);
+      const category: category = response.data;
+      return category;
+    } catch (error) {
+      checkError(error);
       return undefined;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -278,15 +273,12 @@ export default function useData() {
     try {
       setIsloading(true);
       const response = await productsAPI(Cookies.get("token") ?? "", search, offset);
-      if (response.status === 200) {
-        const products: Array<product> = response.data.data;
-        const total: number = response.data.pagination.total;
-        return {products, total};
-      }
-      setErrorMessage(response.statusText);
+      const products: Array<product> = response.data.data;
+      const total: number = response.data.pagination.total;
+      return {products, total};
+    } catch (error) {
+      checkError(error);
       return null;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -296,14 +288,11 @@ export default function useData() {
     try {
       setIsloading(true);
       const response = await productAPI(Cookies.get("token") ?? "", id);
-      if (response.status === 200) {
-        const product: product = response.data;
-        return product;
-      }
-      setErrorMessage(response.statusText);
+      const product: product = response.data;
+      return product;
+    } catch (error) {
+      checkError(error);
       return undefined;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -313,12 +302,11 @@ export default function useData() {
   const deleteUser = async (id: number) => {
     try {
       setIsloading(true);
-      const response = await deleteUserAPI(Cookies.get("token") ?? "", id);
-      if (response.status === 204) return true;
-      setErrorMessage(response.statusText);
+      await deleteUserAPI(Cookies.get("token") ?? "", id);
+      return true;
+    } catch (error) {
+      checkError(error);
       return false;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -327,12 +315,11 @@ export default function useData() {
   const deleteEvent = async (id: number) => {
     try {
       setIsloading(true);
-      const response = await deleteEventAPI(Cookies.get("token") ?? "", id);
-      if (response.status === 204) return true;
-      setErrorMessage(response.statusText);
+      await deleteEventAPI(Cookies.get("token") ?? "", id);
+      return true;
+    } catch (error) {
+      checkError(error);
       return false;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -341,12 +328,11 @@ export default function useData() {
   const deleteVat = async (type: string) => {
     try {
       setIsloading(true);
-      const response = await deleteVatAPI(Cookies.get("token") ?? "", type);
-      if (response.status === 204) return true;
-      setErrorMessage(response.statusText);
+      await deleteVatAPI(Cookies.get("token") ?? "", type);
+      return true;
+    } catch (error) {
+      checkError(error);
       return false;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -355,12 +341,11 @@ export default function useData() {
   const deleteCateogry = async (id: number) => {
     try {
       setIsloading(true);
-      const response = await deleteCategoryAPI(Cookies.get("token") ?? "", id);
-      if (response.status === 204) return true;
-      setErrorMessage(response.statusText);
+      await deleteCategoryAPI(Cookies.get("token") ?? "", id);
+      return true;
+    } catch (error) {
+      checkError(error);
       return false;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -369,12 +354,11 @@ export default function useData() {
   const deleteProduct = async (id: number) => {
     try {
       setIsloading(true);
-      const response = await deletProductAPI(Cookies.get("token") ?? "", id);
-      if (response.status === 204) return true;
-      setErrorMessage(response.statusText);
+      await deletProductAPI(Cookies.get("token") ?? "", id);
+      return true;
+    } catch (error) {
+      checkError(error);
       return false;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -384,12 +368,11 @@ export default function useData() {
   const editUser = async (id: number, user: user) => {
     try {
       setIsloading(true);
-      const response = await editUserAPI(Cookies.get("token") ?? "", id, user);
-      if (response.status === 204) return true;
-      setErrorMessage(response.statusText);
+      await editUserAPI(Cookies.get("token") ?? "", id, user);
+      return true;
+    } catch (error) {
+      checkError(error);
       return false;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -398,12 +381,11 @@ export default function useData() {
   const editEvent = async (id: number, event: event) => {
     try {
       setIsloading(true);
-      const response = await editEventAPI(Cookies.get("token") ?? "", id, event);
-      if (response.status === 204) return true;
-      setErrorMessage(response.statusText);
+      await editEventAPI(Cookies.get("token") ?? "", id, event);
+      return true;
+    } catch (error) {
+      checkError(error);
       return false;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -412,12 +394,11 @@ export default function useData() {
   const editVat = async (type: string, vat: vat) => {
     try {
       setIsloading(true);
-      const response = await editVatAPI(Cookies.get("token") ?? "", type, vat);
-      if (response.status === 204) return true;
-      setErrorMessage(response.statusText);
+      await editVatAPI(Cookies.get("token") ?? "", type, vat);
+      return true;
+    } catch (error) {
+      checkError(error);
       return false;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -426,12 +407,11 @@ export default function useData() {
   const editCategory = async (id: number, category: category) => {
     try {
       setIsloading(true);
-      const response = await editCategoryAPI(Cookies.get("token") ?? "", id, category);
-      if (response.status === 204) return true;
-      setErrorMessage(response.statusText);
+      await editCategoryAPI(Cookies.get("token") ?? "", id, category);
+      return true;
+    } catch (error) {
+      checkError(error);
       return false;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }
@@ -440,12 +420,11 @@ export default function useData() {
   const editProduct = async (id: number, product: product) => {
     try {
       setIsloading(true);
-      const response = await editProductAPI(Cookies.get("token") ?? "", id, product);
-      if (response.status === 204) return true;
-      setErrorMessage(response.statusText);
+      await editProductAPI(Cookies.get("token") ?? "", id, product);
+      return true;
+    } catch (error) {
+      checkError(error);
       return false;
-    } catch {
-      setErrorMessage("Erreur serveur");
     } finally {
       setIsloading(false);
     }

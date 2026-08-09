@@ -69,7 +69,7 @@ export default function CRUDCategories({ category, submitFunc, isLoading }: { ca
             if (Number(params.id)) {
               const isDone = await deleteCateogry(Number(params.id));
               if (isDone) {
-                navigate("/users");
+                navigate("/categories");
               } else {
                 setModalIsOpen(true);
               }
