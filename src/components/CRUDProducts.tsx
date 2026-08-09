@@ -44,7 +44,6 @@ export default function CRUDProducts({ product, submitFunc, isLoading }: { produ
         label,
         is_available,
         excl_vat_price: Number(excl_vat_price),
-        picture: product?.picture,
         event_id: Number(eventId),
         category: {
           id: Number(categoryId),

@@ -29,7 +29,7 @@ export default function CRUDEvents({ event, submitFunc, isLoading }: { event?: e
     const iban = ibanRef.current?.value;
 
     if (name && location && is_active !== undefined && iban) {
-      submitFunc({ name, location, is_active, image: event?.image, iban }, image);
+      submitFunc({ name, location, is_active, iban }, image);
     }
   }
 

@@ -28,7 +28,7 @@ export default function CRUDCategories({ category, submitFunc, isLoading }: { ca
     const picture = pictureRef.current?.files?.[0];
 
     if (label && vat_type) {
-      submitFunc({ label, vat_type, picture: category?.picture }, picture);
+      submitFunc({ label, vat_type }, picture);
     }
   }
 
