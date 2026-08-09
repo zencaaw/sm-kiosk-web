@@ -8,7 +8,7 @@ import type {
   product as productType
 } from "./type";
 
-const url = "https://sm-kiosk-production.up.railway.app";
+const url = "https://sm-kiosk-production.up.railway.app/v1/";
 
 axiosRetry(axios, {
   retries: 5,
