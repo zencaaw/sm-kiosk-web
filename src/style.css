@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+input {
+  @apply border border-gray-200 pr-2 pl-10 py-2 rounded-xl bg-white disabled:text-gray-300;
+}
+
+select {
+  @apply border border-gray-200 p-2 rounded-xl bg-white disabled:text-gray-300;
+}
+
+button {
+  @apply py-2 px-4 rounded-xl text-white cursor-pointer active:not-disabled:scale-98 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+h1 {
+  @apply text-2xl;
+}
+
+th,
+td {
+  @apply text-center;
+}
