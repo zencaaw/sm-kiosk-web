@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router";
+import { BrowserRouter, Navigate, Routes, Route } from "react-router";
 import './style.css';
 
 import Header from "./templates/Header";
@@ -27,6 +27,7 @@ function App() {
     <BrowserRouter>
       <Suspense fallback={<Loader isLoading />}>
         <Routes>
+          <Route path="/" element={<Navigate to="/users" replace />} />
           <Route element={<Header />}>
             <Route path="/users">
               <Route path="" element={<Users />} />

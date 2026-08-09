@@ -14,9 +14,7 @@ export const HeaderSlice = createSlice({
   },
 });
 
-// export des actions
 export const { changeTitle } =
   HeaderSlice.actions;
 
-// export du reducer pour le store
 export default HeaderSlice.reducer;
