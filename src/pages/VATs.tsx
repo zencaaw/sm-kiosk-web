@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { changeTitle } from "../store/headerSlice";
-import { Search, Plus, ChevronLeft, ChevronRight, LoaderCircle } from "lucide-react";
+import { Search, Plus, LoaderCircle } from "lucide-react";
 import { useNavigate } from "react-router";
 import IconInput from "../components/IconInput";
 import type { vat } from "../type";
 import useData from "../hooks/useData";
 import Modal from "../components/Modal";
+import Pagination from "../components/Pagination";
 
 export default function VATs() {
   const dispatch = useDispatch();
@@ -16,6 +17,8 @@ export default function VATs() {
   const [search, setSearch] = useState("");
   const [vatsList, setVatsList] = useState<Array<vat>>([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [offset, setOffset] = useState(0);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     dispatch(changeTitle("TVA"));
@@ -23,14 +26,15 @@ export default function VATs() {
 
   useEffect(() => {
     (async () => {
-      const response = await vats(search, 0);
+      const response = await vats(search, offset);
       if (response) {
         setVatsList(response.vats);
+        setTotal(response.total);
       } else {
         setModalIsOpen(true);
       }
     })();
-  }, [search]);
+  }, [search, offset]);
 
   return (
     <>
@@ -41,7 +45,7 @@ export default function VATs() {
         <div className="flex justify-end items-center gap-2">
           <LoaderCircle className={`animate-spin ${isLoading ? "" : "hidden"}`} />
           <button onClick={() => navigate("add")} className="bg-blue-500"><Plus /></button>
-          <IconInput Icon={<Search/>} onChange={(e) => setSearch(e.currentTarget.value)} type="text" placeholder="Recherche" className="w-fit"/>
+          <IconInput Icon={<Search/>} onChange={(e) => { setSearch(e.currentTarget.value); setOffset(0); }} type="text" placeholder="Recherche" className="w-fit"/>
         </div>
         <section className="flex-1">
           <div className="flex justify-around items-center p-3 border border-gray-300 mb-5 rounded-2xl font-bold text-xl">
@@ -61,10 +65,7 @@ export default function VATs() {
             ))}
           </div>
         </section>
-        <div className="flex gap-2 justify-end">
-          <button className="bg-blue-500"><ChevronLeft/></button>
-          <button className="bg-blue-500"><ChevronRight/></button>
-        </div>
+        <Pagination total={total} offset={offset} setOffset={setOffset} />
       </main>
     </>
   );

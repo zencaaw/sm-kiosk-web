@@ -7,6 +7,7 @@ import IconInput from "../components/IconInput";
 import type { event } from "../type";
 import useData from "../hooks/useData";
 import Modal from "../components/Modal";
+import Pagination from "../components/Pagination";
 
 export default function Events() {
   const navigate = useNavigate();
@@ -15,6 +16,8 @@ export default function Events() {
   const [search, setSearch] = useState("");
   const [eventsList, setEventsList] = useState<Array<event>>([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [offset, setOffset] = useState(0);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     dispatch(changeTitle("Évènement"));
@@ -22,14 +25,15 @@ export default function Events() {
 
   useEffect(() => {
     (async () => {
-      const response = await events(search, 0);
+      const response = await events(search, offset);
       if (response) {
         setEventsList(response.events)
+        setTotal(response.total);
       } else {
         setModalIsOpen(true);
       }
     })();
-  }, [search]);
+  }, [search, offset]);
 
   return (
     <>
@@ -40,7 +44,7 @@ export default function Events() {
         <div className="flex justify-end items-center gap-2">
           <LoaderCircle className={`animate-spin ${isLoading ? "" : "hidden"}`} />
           <button onClick={() => navigate("add")} className="bg-blue-500"><Plus /></button>
-          <IconInput Icon={<Search/>} onChange={(e) => setSearch(e.currentTarget.value)} type="text" placeholder="Recherche" className="w-fit"/>
+          <IconInput Icon={<Search/>} onChange={(e) => { setSearch(e.currentTarget.value); setOffset(0); }} type="text" placeholder="Recherche" className="w-fit"/>
         </div>
         <section className="flex-1">
           <div className="flex justify-around items-center p-3 border border-gray-300 mb-5 rounded-2xl font-bold text-xl">
@@ -71,6 +75,7 @@ export default function Events() {
             ))}
           </div>
         </section>
+        <Pagination total={total} offset={offset} setOffset={setOffset} />
       </main>
     </>
   );

@@ -39,12 +39,61 @@ export const createUser = async (token: string, user: userType) => {
   return response;
 };
 
+export const createEvent = async (token: string, event: eventType) => {
+  const response = await axios.post(`${url}interact/me/event`,
+    {
+      name: event.name,
+      location: event.location,
+      is_active: event.is_active,
+      image: event.image,
+      iban: event.iban,
+    },
+    {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response;
+};
+
 export const createCategory = async (token: string, category: categoryType) => {
   const response = await axios.post(`${url}interact/category`,
     {
       label: category.label,
       vat_type: category.vat_type,
       picture: category.picture
+    },
+    {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response;
+};
+
+export const createVat = async (token: string, vat: vatType) => {
+  const response = await axios.post(`${url}interact/vat`,
+    {
+      type: vat.type,
+      rate: vat.rate,
+    },
+    {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response;
+};
+
+export const createProduct = async (token: string, product: productType) => {
+  const response = await axios.post(`${url}interact/product`,
+    {
+      label: product.label,
+      is_available: product.is_available,
+      excl_vat_price: product.excl_vat_price,
+      picture: product.picture,
+      category_id: product.category.id,
+      event_id: product.event_id
     },
     {
     headers: {
@@ -101,8 +150,8 @@ export const vats = async (token: string, search: string, offset: number) => {
   return response;
 };
 
-export const vat = async (token: string, id: number) => {
-  const response = await axios.get(`${url}interact/vat/${id}`, {
+export const vat = async (token: string, type: string) => {
+  const response = await axios.get(`${url}interact/vat/${type}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -156,7 +205,7 @@ export const deleteUser = async (token: string, id: number) => {
   return response;
 };
 
-export const deletevent = async (token: string, id: number) => {
+export const deleteEvent = async (token: string, id: number) => {
   const response = await axios.delete(`${url}interact/event/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -165,8 +214,8 @@ export const deletevent = async (token: string, id: number) => {
   return response;
 };
 
-export const deletvat = async (token: string, id: number) => {
-  const response = await axios.delete(`${url}interact/vat/${id}`, {
+export const deleteVat = async (token: string, type: string) => {
+  const response = await axios.delete(`${url}interact/vat/${type}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -229,8 +278,8 @@ export const editEvent = async (token: string, id: number, event: eventType) => 
   return response;
 };
 
-export const editVat = async (token: string, id: number, vat: vatType) => {
-  const response = await axios.patch(`${url}interact/vat/${id}`,
+export const editVat = async (token: string, type: string, vat: vatType) => {
+  const response = await axios.patch(`${url}interact/vat/${type}`,
     {
       type: vat.type,
       rate: vat.rate,
@@ -259,7 +308,7 @@ export const editCategory = async (token: string, id: number, category: category
 };
 
 export const editProduct= async (token: string, id: number, product: productType) => {
-  const response = await axios.patch(`${url}interact/event/${product.event_id}/product/${id}`,
+  const response = await axios.patch(`${url}interact/product/${id}`,
     {
       label: product.label,
       is_available: product.is_available,

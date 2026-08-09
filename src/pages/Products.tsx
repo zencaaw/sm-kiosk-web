@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { changeTitle } from "../store/headerSlice";
-import { ChevronLeft, ChevronRight, Image, LoaderCircle, Plus, Search } from "lucide-react";
+import { Image, LoaderCircle, Plus, Search } from "lucide-react";
 import { useNavigate } from "react-router";
 import IconInput from "../components/IconInput";
 import useData from "../hooks/useData";
 import type { product } from "../type";
 import Modal from "../components/Modal";
+import Pagination from "../components/Pagination";
 
 export default function Products() {
   const navigate = useNavigate();
@@ -16,6 +17,8 @@ export default function Products() {
   const [search, setSearch] = useState("");
   const [productsList, setProductsList] = useState<Array<product>>([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [offset, setOffset] = useState(0);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     dispatch(changeTitle("Produits"));
@@ -23,14 +26,15 @@ export default function Products() {
 
   useEffect(() => {
     (async () => {
-      const response = await products(search, 0);
+      const response = await products(search, offset);
       if (response) {
         setProductsList(response.products);
+        setTotal(response.total);
       } else {
         setModalIsOpen(true);
       }
     })();
-  }, [search]);
+  }, [search, offset]);
 
   return (
     <>
@@ -41,7 +45,7 @@ export default function Products() {
         <div className="flex justify-end items-center gap-2">
           <LoaderCircle className={`animate-spin ${isLoading ? "" : "hidden"}`} />
           <button onClick={() => navigate("add")} className="bg-blue-500"><Plus /></button>
-          <IconInput Icon={<Search/>} onChange={(e) => setSearch(e.currentTarget.value)} type="text" placeholder="Recherche" className="w-fit"/>
+          <IconInput Icon={<Search/>} onChange={(e) => { setSearch(e.currentTarget.value); setOffset(0); }} type="text" placeholder="Recherche" className="w-fit"/>
         </div>
         <section className="flex-1">
           <div className="flex justify-around items-center p-3 border border-gray-300 mb-5 rounded-2xl font-bold text-xl">
@@ -74,10 +78,7 @@ export default function Products() {
             ))}
           </div>
         </section>
-        <div className="flex gap-2 justify-end">
-          <button className="bg-blue-500"><ChevronLeft/></button>
-          <button className="bg-blue-500"><ChevronRight/></button>
-        </div>
+        <Pagination total={total} offset={offset} setOffset={setOffset} />
       </main>
     </>
   );

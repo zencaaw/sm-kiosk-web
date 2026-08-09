@@ -7,6 +7,7 @@ import IconInput from "../components/IconInput";
 import useData from "../hooks/useData";
 import type { category } from "../type";
 import Modal from "../components/Modal";
+import Pagination from "../components/Pagination";
 
 export default function Categories() {
   const dispatch = useDispatch();
@@ -16,6 +17,8 @@ export default function Categories() {
   const [search, setSearch] = useState("");
   const [categoriesList, setCategoriesList] = useState<Array<category>>([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [offset, setOffset] = useState(0);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     dispatch(changeTitle("Catégories"));
@@ -23,14 +26,15 @@ export default function Categories() {
 
   useEffect(() => {
     (async () => {
-      const response = await categories(search, 0);
+      const response = await categories(search, offset);
       if (response) {
         setCategoriesList(response.categories);
+        setTotal(response.total);
       } else {
         setModalIsOpen(true);
       }
     })();
-  }, [search]);
+  }, [search, offset]);
 
   return (
     <>
@@ -41,7 +45,7 @@ export default function Categories() {
         <div className="flex justify-end items-center gap-2">
           <LoaderCircle className={`animate-spin ${isLoading ? "" : "hidden"}`} />
           <button onClick={() => navigate("add")} className="bg-blue-500"><Plus /></button>
-          <IconInput Icon={<Search/>} onChange={(e) => setSearch(e.currentTarget.value)} type="text" placeholder="Recherche" className="w-fit"/>
+          <IconInput Icon={<Search/>} onChange={(e) => { setSearch(e.currentTarget.value); setOffset(0); }} type="text" placeholder="Recherche" className="w-fit"/>
         </div>
         <section className="flex-1">
           <div className="flex justify-around items-center p-3 border border-gray-300 mb-5 rounded-2xl font-bold text-xl">
@@ -68,10 +72,7 @@ export default function Categories() {
             ))}
           </div>
         </section>
-        <div className="flex gap-2 justify-end">
-          <button className="bg-blue-500"><ChevronLeft/></button>
-          <button className="bg-blue-500"><ChevronRight/></button>
-        </div>
+        <Pagination total={total} offset={offset} setOffset={setOffset} />
       </main>
     </>
   );
